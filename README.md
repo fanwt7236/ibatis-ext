@@ -1,4 +1,6 @@
 ## iBatis2.3.5原生版本扩展
+### 实现了dao动态代理（参照MyBatis实现）
+参照MyBatis实现了dao的jdk动态代理
 ### 修改insert返回值
 正如在改ibator时所说，ibatis中存在一个可优化的点:insert。原生iBatis在insert动作后会返回selectKey的结果（如果配了的话），但是我们通常可以在selectKey上添加属性javaProperty来给对象的属性进行复制，这样一来，再把结果返回显得有点多余（MyBatis中已经修改了此设计）。为了实现在insert时能够返回该条sql影响的记录数，我们需要对iBatis原有的实现进行重写，好在iBatis还有一些扩展的空间，可以在sqlMapConfig.xml文件中指定properties文件，并在properties文件中指定一个sql_executor_class来按照自己的想法执行程序。
 现在我们可以来研究一下sql_executor_class配置相关的一些知识:
