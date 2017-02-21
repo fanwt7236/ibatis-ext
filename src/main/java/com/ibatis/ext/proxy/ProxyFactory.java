@@ -15,7 +15,6 @@ import com.ibatis.ext.proxy.annotation.Key;
 import com.ibatis.ext.proxy.annotation.Param;
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.engine.impl.SqlMapClientImpl;
-import com.ibatis.sqlmap.engine.impl.SqlMapSessionImpl;
 import com.ibatis.sqlmap.engine.mapping.statement.MappedStatement;
 import com.ibatis.sqlmap.engine.mapping.statement.StatementType;
 
@@ -46,23 +45,22 @@ class ProxyFactory implements InvocationHandler {
 			if (method.getName().equals("toString")) {
 				return this.clazz.getName() + target.getClass().getName();
 			}
-			SqlMapSessionImpl session = (SqlMapSessionImpl) this.client.openSession();
 			MappedStatement id = ((SqlMapClientImpl) this.client).getMappedStatement(this.clazz.getName() + "." + method.getName());
 			if (id.getStatementType() == StatementType.INSERT) {
-				return session.insert(id.getId(), getParam(params, method));
+				return this.client.insert(id.getId(), getParam(params, method));
 			} else if (id.getStatementType() == StatementType.UPDATE) {
-				return session.update(id.getId(), getParam(params, method));
+				return this.client.update(id.getId(), getParam(params, method));
 			} else if (id.getStatementType() == StatementType.DELETE) {
-				return session.delete(id.getId(), getParam(params, method));
+				return this.client.delete(id.getId(), getParam(params, method));
 			} else {
 				ResultStruct result = returnTypeParse(method);
 				switch (result.type) {
 				case LIST:
-					return session.queryForList(id.getId(), getParam(params, method));
+					return this.client.queryForList(id.getId(), getParam(params, method));
 				case MAP:
-					return session.queryForMap(id.getId(), getParam(params, method), result.key);
+					return this.client.queryForMap(id.getId(), getParam(params, method), result.key);
 				case OBJECT:
-					return session.queryForObject(id.getId(), getParam(params, method));
+					return this.client.queryForObject(id.getId(), getParam(params, method));
 				default:
 					return null;
 				}
