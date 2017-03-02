@@ -1,4 +1,14 @@
 ## iBatis2.3.5原生版本扩展
+### 扩展了对spring默认事务管理器的支持，com.ibatis.ext.transaction.DataSourcesTransactionManager 可以支持多数据源的n阶段提交。
+
+	<bean id="txManager" class="com.ibatis.ext.transaction.DataSourcesTransactionManager">
+		<property name="dataSources">
+			<list>
+				<ref bean="firstDataSource"/>
+				<ref bean="secondDataSource"/>
+			</list>
+		</property>
+	</bean>
 ### 扩展了ibatis二级缓存（memcached、redis）
 ### 实现了dao动态代理（参照MyBatis实现）
 参照MyBatis实现了dao的jdk动态代理，在使用时需依赖spring相关的jar包。配置如下:  
