@@ -51,7 +51,7 @@ class ProxyFactory implements InvocationHandler {
 				if(method.getReturnType().isPrimitive() && value == null){
 					throw new SQLException("声明了insert方法的返回值类型为基本类型，而实际并没有返回值。");
 				}
-				return this.client.insert(id.getId(), getParam(params, method));
+				return value;
 			} else if (id.getStatementType() == StatementType.UPDATE) {
 				return this.client.update(id.getId(), getParam(params, method));
 			} else if (id.getStatementType() == StatementType.DELETE) {
