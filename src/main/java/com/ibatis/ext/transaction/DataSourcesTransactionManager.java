@@ -160,14 +160,6 @@ public class DataSourcesTransactionManager extends DataSourceTransactionManager 
 		}
 	}
 
-	public void setDataSources(List<DataSource> dataSources) {
-		this.dataSources = dataSources;
-	}
-
-	public List<DataSource> getDataSources() {
-		return dataSources;
-	}
-	
 	@Override
 	protected boolean isExistingTransaction(Object transaction) {
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
@@ -247,6 +239,14 @@ public class DataSourcesTransactionManager extends DataSourceTransactionManager 
 
 	public Object getResourceFactory() {
 		return getDataSources();
+	}
+	
+	public void setDataSources(List<DataSource> dataSources) {
+		this.dataSources = dataSources;
+	}
+
+	public List<DataSource> getDataSources() {
+		return dataSources;
 	}
 
 	/**
