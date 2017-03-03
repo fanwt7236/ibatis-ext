@@ -32,10 +32,11 @@
 1.在哪里加载。通过阅读源码，不难发现sql_executor_class是在com.ibatis.sqlmap.engine.builder.xml.XmlParserState.setGlobalProperties()方法中进行读取的，读取之后执行了两个操作:
 config.getClient().getDelegate().setCustomExecutor(customizedSQLExecutor);//设置自定义的sqlExecutor
 config.getClient().getDelegate().getSqlExecutor().init(config, globalProps);//对自定义的sqlExecutor进行初始化。
-请注意，init方法中传入的config参数就是SqlMapConfiguration对象，通过SqlMapConfiguration对象，我们可以拿到与SqlMapClient相关的一切信息（可能会用到反射）
+请注意，init方法中传入的config参数就是SqlMapConfiguration对象，通过SqlMapConfiguration对象，我们可以拿到与SqlMapClient相关的一切信息（可能会用到反射）  
 2.原生的insert方法的最终实现在哪里，又是在哪个文件中设置了insert方法的返回值。
-通过跟踪源码，不难发现com.ibatis.sqlmap.engine.impl.SqlMapExecutorDelegate.insert中将selectKey的值返回了，因此我们只需要重写insert方法，并将其中ms.executeUpdate(statementScope, trans, param)的值返回即可。
+通过跟踪源码，不难发现com.ibatis.sqlmap.engine.impl.SqlMapExecutorDelegate.insert中将selectKey的值返回了，因此我们只需要重写insert方法，并将其中ms.executeUpdate(statementScope, trans, param)的值返回即可。  
 基于以上两点，我们可以重写insert方法的原有实现，将影响的记录数返回。在这里需要有一点需要特别注意的，请看下面的代码:
+
 		//这里把原有client的执行代理进行了扩展，扩展的执行代理支持了insert返回影响记录数以及支持了真分页查询
 		SqlMapExecutorDelegate delegate = new SqlMapExecutorDelegateExt(config.getDelegate(), this);
 		config.getClient().delegate = delegate;
@@ -53,6 +54,6 @@ config.getClient().getDelegate().getSqlExecutor().init(config, globalProps);//�
 ### 支持真分页
 在开发过程中，分页查询是应用非常普遍同时也非常模式化的一件事。而iBatis的默认分页是假分页，既然我们都已经对sqlExecutor有了初步的认识，我们就可以通过重写executeQuery方法来实现真分页。
 我将在分页查询中用到的一些参数都封装在了一个叫做Page的类中，如pageNum,pageSize等，详情参见com.ibatis.ext.paging.Page，在executeQuery时根据Page对象进行组装sql从而实现真分页
-那么如何在executeQuery方法中得到从位置地方传来的Page对象呢？这里用到的是ThreadLocal进行线程內的隐式传参，同时也配置了一个正则表达式用于和sqlMap文件中的statementId进行规则匹配，符合规则的才会进行分页查询（这样做是因为有场景需要查询全部数据）。详细参见代码吧!今天只进行了初步的测试，其中可能有不少bug，遇到时再修复吧！
+那么如何在executeQuery方法中得到从位置地方传来的Page对象呢？这里用到的是ThreadLocal进行线程內的隐式传参，同时也配置了一个正则表达式用于和sqlMap文件中的statementId进行规则匹配，符合规则的才会进行分页查询（这样做是因为有场景需要查询全部数据）。详细参见代码吧!今天只进行了初步的测试，其中可能有不少bug，遇到时再修复吧！  
 主要代码参见：com.ibatis.ext.SqlExecutorExt
 
